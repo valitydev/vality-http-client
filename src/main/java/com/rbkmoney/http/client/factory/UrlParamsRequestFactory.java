@@ -1,4 +1,4 @@
-package com.rbkmoney.http.client;
+package com.rbkmoney.http.client.factory;
 
 import com.rbkmoney.http.client.exception.GenerateRequestException;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.rbkmoney.http.client;
+package com.rbkmoney.http.client.pool;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 

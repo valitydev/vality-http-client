@@ -1,5 +1,8 @@
 package com.rbkmoney.http.client;
 
+import com.rbkmoney.http.client.factory.HttpClientFactory;
+import com.rbkmoney.http.client.pool.HttpClientPool;
+import com.rbkmoney.http.client.pool.SslCertHttpClientPool;
 import com.rbkmoney.http.client.properties.SslRequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
@@ -12,7 +15,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class SslCertHttpClientPoolTest {
+public class SslCertSimpleHttpClientPoolTest {
 
     private static final String CERT_NAME = "certName";
 

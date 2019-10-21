@@ -1,4 +1,4 @@
-package com.rbkmoney.http.client;
+package com.rbkmoney.http.client.factory;
 
 import org.apache.http.client.methods.HttpPost;
 

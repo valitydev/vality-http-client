@@ -1,4 +1,4 @@
-package com.rbkmoney.http.client;
+package com.rbkmoney.http.client.factory;
 
 import com.rbkmoney.http.client.exception.ClientCreationException;
 import com.rbkmoney.http.client.properties.KeyStoreProperties;

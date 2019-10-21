@@ -1,5 +1,6 @@
-package com.rbkmoney.http.client;
+package com.rbkmoney.http.client.pool;
 
+import com.rbkmoney.http.client.factory.HttpClientFactory;
 import com.rbkmoney.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
