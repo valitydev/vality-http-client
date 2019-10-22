@@ -1,10 +1,9 @@
 package com.rbkmoney.http.client;
 
 import com.rbkmoney.http.client.domain.Response;
+import com.rbkmoney.http.client.exception.RemoteInvocationException;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +46,20 @@ public class SimpleHttpClientTest {
         Assert.assertNull(post.getEntity());
     }
 
+    @Test(expected = RemoteInvocationException.class)
+    public void postException() throws URISyntaxException, IOException {
+        HttpPost httpPost = new HttpPost();
+        httpPost.setURI(new URI("/test"));
+
+        Mockito.when(closeableHttpClient.execute(httpPost)).thenThrow(new RuntimeException("test!"));
+
+        Response<Object> post = simpleHttpClient.post("test", httpPost, closeableHttpResponse -> {
+            return null;
+        }, closeableHttpClient);
+
+        Assert.assertNull(post.getEntity());
+    }
+
     @Test
     public void get() throws URISyntaxException, IOException {
         HttpGet httpGet = new HttpGet();
@@ -59,6 +72,34 @@ public class SimpleHttpClientTest {
         }, closeableHttpClient);
 
         Assert.assertNull(post.getEntity());
+    }
+
+    @Test
+    public void delete() throws URISyntaxException, IOException {
+        HttpDelete httpDelete = new HttpDelete();
+        httpDelete.setURI(new URI("/test"));
+
+        Mockito.when(closeableHttpClient.execute(httpDelete)).thenReturn(closeableHttpResponse);
+
+        Response<Object> deleteResponse = simpleHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> {
+            return null;
+        }, closeableHttpClient);
+
+        Assert.assertNull(deleteResponse.getEntity());
+    }
+
+    @Test
+    public void put() throws URISyntaxException, IOException {
+        HttpPut httpPut = new HttpPut();
+        httpPut.setURI(new URI("/test"));
+
+        Mockito.when(closeableHttpClient.execute(httpPut)).thenReturn(closeableHttpResponse);
+
+        Response<Object> deleteResponse = simpleHttpClient.put("put-test", httpPut, closeableHttpResponse -> {
+            return null;
+        }, closeableHttpClient);
+
+        Assert.assertNull(deleteResponse.getEntity());
     }
 
 }
