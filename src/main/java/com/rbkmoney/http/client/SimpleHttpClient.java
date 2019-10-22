@@ -68,7 +68,7 @@ public class SimpleHttpClient implements HttpClient {
                 return new Response<>(result);
             }
         } catch (Exception e) {
-            log.error("Error when startCardP2PTrans e: ", e);
+            log.error("Error when httpExecution e: ", e);
             throw new RemoteInvocationException(e);
         }
     }
