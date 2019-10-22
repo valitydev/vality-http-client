@@ -62,7 +62,8 @@ public class HttpClientFactory {
                 .disableAutomaticRetries();
     }
 
-    private SSLContext createSslContext(String certFileName, String certType, String certPass) throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException, UnrecoverableKeyException, KeyManagementException {
+    private SSLContext createSslContext(String certFileName, String certType, String certPass)
+            throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException, UnrecoverableKeyException, KeyManagementException {
         String certificate = keyStoreProperties.getCertificateFolder() + certFileName;
         KeyStore keyStore = createKeyStore(certType, certificate, certPass);
         return createSslContext(keyStore, certPass);
@@ -76,7 +77,8 @@ public class HttpClientFactory {
                 .build();
     }
 
-    private KeyStore createKeyStore(String type, String certificate, String password) throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
+    private KeyStore createKeyStore(String type, String certificate, String password)
+            throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
         KeyStore keyStore = KeyStore.getInstance(type);
         try (InputStream pKeyFileStream = Files.newInputStream(Paths.get(certificate))) {
             keyStore.load(pKeyFileStream, password.toCharArray());
@@ -84,7 +86,8 @@ public class HttpClientFactory {
         return keyStore;
     }
 
-    private SSLContext createSslContext(KeyStore keyStore, String password) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+    private SSLContext createSslContext(KeyStore keyStore, String password)
+            throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
         return new SSLContextBuilder()
                 .loadTrustMaterial(keyStore, (x509Certificates, s) -> true)
                 .loadKeyMaterial(keyStore, password.toCharArray())

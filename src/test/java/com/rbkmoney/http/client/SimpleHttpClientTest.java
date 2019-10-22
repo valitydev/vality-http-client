@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 public class SimpleHttpClientTest {
 
     @Mock
@@ -37,13 +40,11 @@ public class SimpleHttpClientTest {
         HttpPost httpPost = new HttpPost();
         httpPost.setURI(new URI("/test"));
 
-        Mockito.when(closeableHttpClient.execute(httpPost)).thenReturn(closeableHttpResponse);
+        when(closeableHttpClient.execute(httpPost)).thenReturn(closeableHttpResponse);
 
-        Response<Object> post = simpleHttpClient.post("test", httpPost, closeableHttpResponse -> {
-            return null;
-        }, closeableHttpClient);
+        Response<Object> post = simpleHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
 
-        Assert.assertNull(post.getEntity());
+        assertNull(post.getEntity());
     }
 
     @Test(expected = RemoteInvocationException.class)
@@ -51,13 +52,11 @@ public class SimpleHttpClientTest {
         HttpPost httpPost = new HttpPost();
         httpPost.setURI(new URI("/test"));
 
-        Mockito.when(closeableHttpClient.execute(httpPost)).thenThrow(new RuntimeException("test!"));
+        when(closeableHttpClient.execute(httpPost)).thenThrow(new RuntimeException("test!"));
 
-        Response<Object> post = simpleHttpClient.post("test", httpPost, closeableHttpResponse -> {
-            return null;
-        }, closeableHttpClient);
+        Response<Object> post = simpleHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
 
-        Assert.assertNull(post.getEntity());
+        assertNull(post.getEntity());
     }
 
     @Test
@@ -65,13 +64,11 @@ public class SimpleHttpClientTest {
         HttpGet httpGet = new HttpGet();
         httpGet.setURI(new URI("/test"));
 
-        Mockito.when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
+        when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
 
-        Response<Object> post = simpleHttpClient.get("get-test", httpGet, closeableHttpResponse -> {
-            return null;
-        }, closeableHttpClient);
+        Response<Object> post = simpleHttpClient.get("get-test", httpGet, closeableHttpResponse -> null, closeableHttpClient);
 
-        Assert.assertNull(post.getEntity());
+        assertNull(post.getEntity());
     }
 
     @Test
@@ -79,13 +76,11 @@ public class SimpleHttpClientTest {
         HttpDelete httpDelete = new HttpDelete();
         httpDelete.setURI(new URI("/test"));
 
-        Mockito.when(closeableHttpClient.execute(httpDelete)).thenReturn(closeableHttpResponse);
+        when(closeableHttpClient.execute(httpDelete)).thenReturn(closeableHttpResponse);
 
-        Response<Object> deleteResponse = simpleHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> {
-            return null;
-        }, closeableHttpClient);
+        Response<Object> deleteResponse = simpleHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> null, closeableHttpClient);
 
-        Assert.assertNull(deleteResponse.getEntity());
+        assertNull(deleteResponse.getEntity());
     }
 
     @Test
@@ -93,13 +88,11 @@ public class SimpleHttpClientTest {
         HttpPut httpPut = new HttpPut();
         httpPut.setURI(new URI("/test"));
 
-        Mockito.when(closeableHttpClient.execute(httpPut)).thenReturn(closeableHttpResponse);
+        when(closeableHttpClient.execute(httpPut)).thenReturn(closeableHttpResponse);
 
-        Response<Object> deleteResponse = simpleHttpClient.put("put-test", httpPut, closeableHttpResponse -> {
-            return null;
-        }, closeableHttpClient);
+        Response<Object> deleteResponse = simpleHttpClient.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpClient);
 
-        Assert.assertNull(deleteResponse.getEntity());
+        assertNull(deleteResponse.getEntity());
     }
 
 }

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.Assert.*;
+
 public class HttpClientFactoryTest {
 
     HttpClientFactory httpClientFactory;
@@ -27,7 +29,7 @@ public class HttpClientFactoryTest {
     public void create() {
         CloseableHttpClient closeableHttpClient = httpClientFactory.create();
 
-        Assert.assertNotNull(closeableHttpClient);
+        assertNotNull(closeableHttpClient);
     }
 
     @Test
@@ -38,6 +40,6 @@ public class HttpClientFactoryTest {
                 .certFileName("rbkmoney.p12")
                 .build());
 
-        Assert.assertNotNull(closeableHttpClient);
+        assertNotNull(closeableHttpClient);
     }
 }
