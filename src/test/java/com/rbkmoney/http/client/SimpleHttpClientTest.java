@@ -24,7 +24,9 @@ public class SimpleHttpClientTest {
     @Mock
     CloseableHttpResponse closeableHttpResponse;
 
-    SimpleHttpClient simpleHttpClient = new SimpleHttpClient(new SimpleMeterRegistry());
+    private SimpleHttpClient simpleHttpClient = SimpleHttpClient.builder()
+            .registry(new SimpleMeterRegistry())
+            .build();
 
     @Before
     public void init() {

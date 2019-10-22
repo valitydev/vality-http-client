@@ -16,6 +16,7 @@ import java.util.function.Function;
 public class SimpleHttpClient implements HttpClient {
 
     private MeterRegistry registry;
+    private boolean enableMetrics;
 
     @Override
     public <T> Response<T> post(String methodName, HttpPost httpPost, Function<CloseableHttpResponse, T> handler,
@@ -43,11 +44,14 @@ public class SimpleHttpClient implements HttpClient {
                                           Function<CloseableHttpResponse, T> handler, CloseableHttpClient client) {
         try {
             Timer.Sample sample = startSampleTimer();
+
             try (CloseableHttpResponse response = client.execute(httpRequestBase)) {
                 String methodType = httpRequestBase.getMethod();
+
                 finishSampleTimer(methodType, methodName, sample, response);
+
                 T result = handler.apply(response);
-                log.debug("HttpClient methodType: {} methodName: {} httpGet: {}  with result: {}", methodType, methodName,
+                log.debug("HttpClient finish methodType: {} methodName: {} httpGet: {}  with result: {}", methodType, methodName,
                         httpRequestBase, result);
                 return new Response<>(result);
             }
@@ -58,18 +62,21 @@ public class SimpleHttpClient implements HttpClient {
     }
 
     private void finishSampleTimer(String methodType, String methodName, Timer.Sample sample, CloseableHttpResponse response) {
-        if (response != null && response.getStatusLine() != null && sample != null) {
+        if (enableMetrics && response != null && response.getStatusLine() != null && sample != null) {
             sample.stop(registry.timer(methodType, methodName,
                     String.valueOf(response.getStatusLine().getStatusCode())));
         }
     }
 
     private Timer.Sample startSampleTimer() {
-        Timer.Sample sample = null;
-        if (registry != null) {
-            sample = Timer.start(registry);
+        if (enableMetrics) {
+            Timer.Sample sample = null;
+            if (registry != null) {
+                sample = Timer.start(registry);
+            }
+            return sample;
         }
-        return sample;
+        return null;
     }
 
 }
