@@ -4,8 +4,8 @@ import org.apache.http.client.methods.HttpPost;
 
 public interface RequestFactory<T> {
 
-    int DEFAULT_CONNECTION_TIMEOUT = 10000;
-    int DEFAULT_SOCKET_TIMEOUT = 30000;
+    int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
+    int DEFAULT_SOCKET_TIMEOUT_MS = 30000;
 
     HttpPost create(T request, String url);
 

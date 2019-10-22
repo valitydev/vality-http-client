@@ -18,12 +18,12 @@ public class UrlParamsRequestFactory implements RequestFactory<Map<String, Strin
 
     @Override
     public HttpPost create(Map<String, String> params, String url) {
-        return createHttpPostUrlParams(params, url, DEFAULT_SOCKET_TIMEOUT);
+        return createHttpPostUrlParams(params, url, DEFAULT_SOCKET_TIMEOUT_MS);
     }
 
     @Override
     public HttpPost createHttpPostUrlParams(Map<String, String> request, String url, int executionTimeout) {
-        return createHttpPostUrlParams(request, url, DEFAULT_CONNECTION_TIMEOUT, executionTimeout);
+        return createHttpPostUrlParams(request, url, DEFAULT_CONNECTION_TIMEOUT_MS, executionTimeout);
     }
 
     @Override
