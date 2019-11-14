@@ -1,12 +1,8 @@
 package com.rbkmoney.http.client.pool;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+public interface HttpClientPool<T, R> {
 
-import java.util.function.Function;
-
-public interface HttpClientPool<T> {
-
-    CloseableHttpClient get(T config);
+    R get(T config);
 
     void destroy();
 

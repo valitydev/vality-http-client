@@ -24,7 +24,7 @@ public class SslCertSimpleHttpClientPoolTest {
     @Mock
     private CloseableHttpClient closeableHttpClient;
 
-    HttpClientPool<SslRequestConfig> httpClientPool;
+    HttpClientPool<SslRequestConfig, CloseableHttpClient> httpClientPool;
 
     @Before
     public void init() {

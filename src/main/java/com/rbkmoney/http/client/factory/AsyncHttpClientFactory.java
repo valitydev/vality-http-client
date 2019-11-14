@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import javax.net.ssl.SSLContext;
@@ -22,7 +22,7 @@ import java.security.cert.CertificateException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class HttpClientFactory {
+public class AsyncHttpClientFactory {
 
     private final int requestTimeout;
     private final int poolTimeout;
@@ -32,9 +32,9 @@ public class HttpClientFactory {
 
     private final KeyStoreProperties keyStoreProperties;
 
-    public CloseableHttpClient create(SslRequestConfig config) {
+    public CloseableHttpAsyncClient create(SslRequestConfig config) {
         try {
-            HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
+            HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
             SSLContext sslContext = createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
             httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                     .setSSLContext(sslContext);
@@ -45,9 +45,9 @@ public class HttpClientFactory {
         }
     }
 
-    public CloseableHttpClient create() {
+    public CloseableHttpAsyncClient create() {
         try {
-            HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
+            HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
             return httpClientBuilder.build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
@@ -55,13 +55,12 @@ public class HttpClientFactory {
         }
     }
 
-    private HttpClientBuilder initHttpClientBuilder() {
+    private HttpAsyncClientBuilder initHttpClientBuilder() {
         RequestConfig config = createDefaultRequestConfig();
-        return HttpClients.custom()
+        return HttpAsyncClients.custom()
                 .setMaxConnTotal(maxTotal)
                 .setMaxConnPerRoute(maxPerRoute)
-                .setDefaultRequestConfig(config)
-                .disableAutomaticRetries();
+                .setDefaultRequestConfig(config);
     }
 
     private SSLContext createSslContext(String certFileName, String certType, String certPass)

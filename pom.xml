@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
     <groupId>com.rbkmoney.rbk.http.client</groupId>
     <artifactId>rbk-http-client</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,6 +42,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>4.1.4</version>
         </dependency>
 
         <!--test-->

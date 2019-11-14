@@ -3,12 +3,11 @@ package com.rbkmoney.http.client.factory;
 import com.rbkmoney.http.client.properties.KeyStoreProperties;
 import com.rbkmoney.http.client.properties.SslRequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class HttpClientFactoryTest {
 
@@ -22,7 +21,7 @@ public class HttpClientFactoryTest {
         keyStoreProperties.setCertificateFolder("./src/test/resources/");
         keyStoreProperties.setPassword("12345");
         keyStoreProperties.setType("pkcs12");
-        httpClientFactory = new HttpClientFactory(1, 1, 1, keyStoreProperties);
+        httpClientFactory = new HttpClientFactory(1, 1, 1, 1, 1, keyStoreProperties);
     }
 
     @Test
