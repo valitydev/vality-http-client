@@ -20,12 +20,18 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
 
     private MeterRegistry registry;
     private boolean isEnableMetric;
+    private CloseableHttpAsyncClient client;
 
     @Override
     public <T> Response<T> post(String methodName,
                                 HttpPost httpPost,
                                 Function<HttpResponse, T> handler,
                                 CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpPost, handler, client);
+    }
+
+    @Override
+    public <T> Response<T> post(String methodName, HttpPost httpPost, Function<HttpResponse, T> handler) {
         return httpExecution(methodName, httpPost, handler, client);
     }
 
@@ -38,6 +44,11 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
     }
 
     @Override
+    public <T> Response<T> get(String methodName, HttpGet httpGet, Function<HttpResponse, T> handler) {
+        return httpExecution(methodName, httpGet, handler, client);
+    }
+
+    @Override
     public <T> Response<T> delete(String methodName,
                                   HttpDelete httpDelete,
                                   Function<HttpResponse, T> handler,
@@ -46,10 +57,20 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
     }
 
     @Override
+    public <T> Response<T> delete(String methodName, HttpDelete httpDelete, Function<HttpResponse, T> handler) {
+        return httpExecution(methodName, httpDelete, handler, client);
+    }
+
+    @Override
     public <T> Response<T> put(String methodName,
                                HttpPut httpPut,
                                Function<HttpResponse, T> handler,
                                CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpPut, handler, client);
+    }
+
+    @Override
+    public <T> Response<T> put(String methodName, HttpPut httpPut, Function<HttpResponse, T> handler) {
         return httpExecution(methodName, httpPut, handler, client);
     }
 

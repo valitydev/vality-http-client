@@ -10,6 +10,7 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import javax.net.ssl.SSLContext;
@@ -29,6 +30,9 @@ public class AsyncHttpClientFactory {
     private final int connectionTimeout;
     private final int maxPerRoute;
     private final int maxTotal;
+
+    //by default availableProcessors
+    private final int ioReactorNumber;
 
     private final KeyStoreProperties keyStoreProperties;
 
@@ -56,11 +60,19 @@ public class AsyncHttpClientFactory {
     }
 
     private HttpAsyncClientBuilder initHttpClientBuilder() {
-        RequestConfig config = createDefaultRequestConfig();
         return HttpAsyncClients.custom()
                 .setMaxConnTotal(maxTotal)
                 .setMaxConnPerRoute(maxPerRoute)
-                .setDefaultRequestConfig(config);
+                .setDefaultIOReactorConfig(initReactor())
+                .setDefaultRequestConfig(createDefaultRequestConfig());
+    }
+
+    private IOReactorConfig initReactor() {
+        return IOReactorConfig.custom()
+                .setIoThreadCount(ioReactorNumber > 0 ? ioReactorNumber : Runtime.getRuntime().availableProcessors())
+                .setConnectTimeout(connectionTimeout)
+                .setSoTimeout(requestTimeout)
+                .build();
     }
 
     private SSLContext createSslContext(String certFileName, String certType, String certPass)

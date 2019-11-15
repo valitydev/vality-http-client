@@ -17,12 +17,18 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
 
     private MeterRegistry registry;
     private boolean isEnableMetric;
+    private CloseableHttpClient client;
 
     @Override
     public <T> Response<T> post(String methodName,
                                 HttpPost httpPost,
                                 Function<CloseableHttpResponse, T> handler,
                                 CloseableHttpClient client) {
+        return httpExecution(methodName, httpPost, handler, client);
+    }
+
+    @Override
+    public <T> Response<T> post(String methodName, HttpPost httpPost, Function<CloseableHttpResponse, T> handler) {
         return httpExecution(methodName, httpPost, handler, client);
     }
 
@@ -35,10 +41,20 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
     }
 
     @Override
+    public <T> Response<T> get(String methodName, HttpGet httpGet, Function<CloseableHttpResponse, T> handler) {
+        return httpExecution(methodName, httpGet, handler, client);
+    }
+
+    @Override
     public <T> Response<T> delete(String methodName,
                                   HttpDelete httpDelete,
                                   Function<CloseableHttpResponse, T> handler,
                                   CloseableHttpClient client) {
+        return httpExecution(methodName, httpDelete, handler, client);
+    }
+
+    @Override
+    public <T> Response<T> delete(String methodName, HttpDelete httpDelete, Function<CloseableHttpResponse, T> handler) {
         return httpExecution(methodName, httpDelete, handler, client);
     }
 
@@ -48,6 +64,11 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
                                Function<CloseableHttpResponse, T> handler,
                                CloseableHttpClient client) {
         return httpExecution(methodName, httpPut, handler, client);
+    }
+
+    @Override
+    public <T> Response<T> put(String methodName, HttpPut httpPut, Function<CloseableHttpResponse, T> handler) {
+        return null;
     }
 
     private <T> Response<T> httpExecution(String methodName,

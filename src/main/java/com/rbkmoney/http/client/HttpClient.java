@@ -14,12 +14,21 @@ public interface HttpClient<C, R extends HttpResponse> {
     <T> Response<T> post(String methodName, HttpPost httpPost, Function<R, T> handler,
                          C client);
 
+    <T> Response<T> post(String methodName, HttpPost httpPost, Function<R, T> handler);
+
     <T> Response<T> get(String methodName, HttpGet httpGet, Function<R, T> handler,
                         C client);
+
+    <T> Response<T> get(String methodName, HttpGet httpGet, Function<R, T> handler);
 
     <T> Response<T> delete(String methodName, HttpDelete httpDelete, Function<R, T> handler,
                            C client);
 
+    <T> Response<T> delete(String methodName, HttpDelete httpDelete, Function<R, T> handler);
+
     <T> Response<T> put(String methodName, HttpPut httpPut, Function<R, T> handler,
                         C client);
+
+    <T> Response<T> put(String methodName, HttpPut httpPut, Function<R, T> handler);
+
 }

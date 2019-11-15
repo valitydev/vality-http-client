@@ -30,13 +30,15 @@ public class SyncAsyncHttpClientTest {
     @Mock
     Future<HttpResponse> httpResponse;
 
-    private SyncAsyncHttpClient syncAsyncHttpClient = SyncAsyncHttpClient.builder()
-            .registry(new SimpleMeterRegistry())
-            .build();
+    private SyncAsyncHttpClient syncAsyncHttpClient;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
+        syncAsyncHttpClient = SyncAsyncHttpClient.builder()
+                .registry(new SimpleMeterRegistry())
+                .client(closeableHttpAsyncClient)
+                .build();
     }
 
     @Test
@@ -47,6 +49,10 @@ public class SyncAsyncHttpClientTest {
         when(closeableHttpAsyncClient.execute(any(), any())).thenReturn(httpResponse);
 
         Response<Object> post = syncAsyncHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpAsyncClient);
+
+        assertNull(post.getEntity());
+
+        post = syncAsyncHttpClient.post("test", httpPost, closeableHttpResponse -> null);
 
         assertNull(post.getEntity());
     }
@@ -73,6 +79,10 @@ public class SyncAsyncHttpClientTest {
         Response<Object> post = syncAsyncHttpClient.get("get-test", httpGet, closeableHttpResponse -> null, closeableHttpAsyncClient);
 
         assertNull(post.getEntity());
+
+        post = syncAsyncHttpClient.get("get-test", httpGet, closeableHttpResponse -> null);
+
+        assertNull(post.getEntity());
     }
 
     @Test
@@ -85,6 +95,10 @@ public class SyncAsyncHttpClientTest {
         Response<Object> deleteResponse = syncAsyncHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> null, closeableHttpAsyncClient);
 
         assertNull(deleteResponse.getEntity());
+
+        deleteResponse = syncAsyncHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> null);
+
+        assertNull(deleteResponse.getEntity());
     }
 
     @Test
@@ -94,9 +108,13 @@ public class SyncAsyncHttpClientTest {
 
         when(closeableHttpAsyncClient.execute(any(), any())).thenReturn(httpResponse);
 
-        Response<Object> deleteResponse = syncAsyncHttpClient.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpAsyncClient);
+        Response<Object> putResponse = syncAsyncHttpClient.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpAsyncClient);
 
-        assertNull(deleteResponse.getEntity());
+        assertNull(putResponse.getEntity());
+
+        putResponse = syncAsyncHttpClient.put("put-test", httpPut, closeableHttpResponse -> null);
+
+        assertNull(putResponse.getEntity());
     }
 
 }
