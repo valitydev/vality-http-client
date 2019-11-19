@@ -1,10 +1,12 @@
 package com.rbkmoney.http.client.pool;
 
+import com.rbkmoney.http.client.factory.AsyncHttpClientFactory;
 import com.rbkmoney.http.client.factory.HttpClientFactory;
 import com.rbkmoney.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,15 +15,15 @@ import java.util.function.Function;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SslCertHttpClientPool implements HttpClientPool<SslRequestConfig, CloseableHttpClient> {
+public class SslCertAsyncHttpClientPool implements HttpClientPool<SslRequestConfig, CloseableHttpAsyncClient> {
 
-    private final HttpClientFactory httpClientFactory;
+    private final AsyncHttpClientFactory httpClientFactory;
     private final Function<SslRequestConfig, String> keyGeneratorFunction;
 
-    private Map<String, CloseableHttpClient> pool = new ConcurrentHashMap<>();
+    private Map<String, CloseableHttpAsyncClient> pool = new ConcurrentHashMap<>();
 
     @Override
-    public CloseableHttpClient get(SslRequestConfig config) {
+    public CloseableHttpAsyncClient get(SslRequestConfig config) {
         return pool.computeIfAbsent(keyGeneratorFunction.apply(config), s -> httpClientFactory.create(config));
     }
 
