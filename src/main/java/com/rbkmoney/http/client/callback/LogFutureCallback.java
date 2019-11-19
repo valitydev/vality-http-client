@@ -13,7 +13,7 @@ public class LogFutureCallback implements FutureCallback<HttpResponse> {
     private final HttpRequestBase httpRequestBase;
 
     public void completed(final HttpResponse response2) {
-        log.info(httpRequestBase.getRequestLine() + " -> " + response2.getStatusLine());
+        log.debug(httpRequestBase.getRequestLine() + " -> " + response2.getStatusLine());
     }
 
     public void failed(final Exception ex) {

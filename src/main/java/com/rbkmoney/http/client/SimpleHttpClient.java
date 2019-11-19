@@ -2,6 +2,7 @@ package com.rbkmoney.http.client;
 
 import com.rbkmoney.http.client.domain.Response;
 import com.rbkmoney.http.client.exception.RemoteInvocationException;
+import com.rbkmoney.http.client.exception.UnknownClientException;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
@@ -68,13 +69,17 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
 
     @Override
     public <T> Response<T> put(String methodName, HttpPut httpPut, Function<CloseableHttpResponse, T> handler) {
-        return null;
+        return httpExecution(methodName, httpPut, handler, client);
     }
 
     private <T> Response<T> httpExecution(String methodName,
                                           HttpRequestBase httpRequestBase,
                                           Function<CloseableHttpResponse, T> handler,
                                           CloseableHttpClient client) {
+        if (client == null) {
+            log.error("SimpleHttpClient client is unknown!");
+            throw new UnknownClientException();
+        }
         try {
             Timer.Sample sample = startSampleTimer();
 

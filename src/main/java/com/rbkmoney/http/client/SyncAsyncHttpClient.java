@@ -3,6 +3,7 @@ package com.rbkmoney.http.client;
 import com.rbkmoney.http.client.callback.LogFutureCallback;
 import com.rbkmoney.http.client.domain.Response;
 import com.rbkmoney.http.client.exception.RemoteInvocationException;
+import com.rbkmoney.http.client.exception.UnknownClientException;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
@@ -78,6 +79,10 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
                                           HttpRequestBase httpRequestBase,
                                           Function<HttpResponse, T> handler,
                                           CloseableHttpAsyncClient client) {
+        if (client == null) {
+            log.error("SimpleHttpClient client is unknown!");
+            throw new UnknownClientException();
+        }
         try {
             Timer.Sample sample = startSampleTimer();
 
