@@ -118,13 +118,9 @@ public class AsyncHttpClientImplTest {
 
     @Test
     public void get() throws ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(2);
+        latchOk = new CountDownLatch(1);
         HttpGet httpGet = new HttpGet("http://127.0.0.1:8089/get/test");
         Future<HttpResponse> get = asyncHttpClient.get("get-test", httpGet);
-        Thread.sleep(100);
-        assertEquals(1, latchOk.getCount());
-        assertNotNull(get.get().getEntity());
-        get = asyncHttpClient.get("get-test", httpGet);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("get", IOUtils.toString(get.get().getEntity().getContent()));
@@ -132,13 +128,9 @@ public class AsyncHttpClientImplTest {
 
     @Test
     public void delete() throws ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(2);
+        latchOk = new CountDownLatch(1);
         HttpDelete httpDelete = new HttpDelete("http://127.0.0.1:8089/delete/test");
         Future<HttpResponse> deleteResponse = asyncHttpClient.delete("delete-test", httpDelete);
-        Thread.sleep(100);
-        assertEquals(1, latchOk.getCount());
-        assertNotNull(deleteResponse.get().getEntity());
-        deleteResponse = asyncHttpClient.delete("delete-test", httpDelete);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("delete", IOUtils.toString(deleteResponse.get().getEntity().getContent()));
@@ -146,14 +138,10 @@ public class AsyncHttpClientImplTest {
 
     @Test
     public void put() throws URISyntaxException, ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(2);
+        latchOk = new CountDownLatch(1);
         HttpPut httpPut = new HttpPut();
         httpPut.setURI(new URI("http://127.0.0.1:8089/put/test"));
         Future<HttpResponse> putResponse = asyncHttpClient.put("put-test", httpPut);
-        Thread.sleep(100);
-        assertEquals(1, latchOk.getCount());
-        assertNotNull(putResponse.get().getEntity());
-        putResponse = asyncHttpClient.put("put-test", httpPut);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("put", IOUtils.toString(putResponse.get().getEntity().getContent()));
