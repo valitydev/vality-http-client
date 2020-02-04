@@ -20,59 +20,71 @@ public class AsyncHttpClientImpl implements AsyncHttpClient<CloseableHttpAsyncCl
     private MeterRegistry registry;
     private boolean isEnableMetric;
     private CloseableHttpAsyncClient client;
-    private FutureCallback<HttpResponse> callback;
 
     @Override
     public Future<HttpResponse> post(String methodName,
-                                HttpPost httpPost,
-                                CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpPost, client);
+                                     HttpPost httpPost,
+                                     FutureCallback<HttpResponse> callback,
+                                     CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpPost, callback, client);
     }
 
     @Override
-    public Future<HttpResponse> post(String methodName, HttpPost httpPost) {
-        return httpExecution(methodName, httpPost, client);
+    public Future<HttpResponse> post(String methodName,
+                                     HttpPost httpPost,
+                                     FutureCallback<HttpResponse> callback) {
+        return httpExecution(methodName, httpPost, callback, client);
     }
 
     @Override
     public Future<HttpResponse> get(String methodName,
-                               HttpGet httpGet,
-                               CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpGet, client);
+                                    HttpGet httpGet,
+                                    FutureCallback<HttpResponse> callback,
+                                    CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpGet, callback, client);
     }
 
     @Override
-    public Future<HttpResponse> get(String methodName, HttpGet httpGet) {
-        return httpExecution(methodName, httpGet, client);
+    public Future<HttpResponse> get(String methodName,
+                                    HttpGet httpGet,
+                                    FutureCallback<HttpResponse> callback) {
+        return httpExecution(methodName, httpGet, callback, client);
     }
 
     @Override
     public Future<HttpResponse> delete(String methodName,
-                                  HttpDelete httpDelete,
-                                  CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpDelete, client);
+                                       HttpDelete httpDelete,
+                                       FutureCallback<HttpResponse> callback,
+                                       CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpDelete, callback, client);
     }
 
     @Override
-    public Future<HttpResponse> delete(String methodName, HttpDelete httpDelete) {
-        return httpExecution(methodName, httpDelete, client);
+    public Future<HttpResponse> delete(String methodName,
+                                       HttpDelete httpDelete,
+                                       FutureCallback<HttpResponse> callback) {
+        return httpExecution(methodName, httpDelete, callback, client);
     }
 
     @Override
     public Future<HttpResponse> put(String methodName,
-                               HttpPut httpPut,
-                               CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpPut, client);
+                                    HttpPut httpPut,
+                                    FutureCallback<HttpResponse> callback,
+                                    CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, httpPut, callback, client);
     }
 
     @Override
-    public Future<HttpResponse> put(String methodName, HttpPut httpPut) {
-        return httpExecution(methodName, httpPut, client);
+    public Future<HttpResponse> put(String methodName,
+                                    HttpPut httpPut,
+                                    FutureCallback<HttpResponse> callback) {
+        return httpExecution(methodName, httpPut, callback, client);
     }
 
     private Future<HttpResponse> httpExecution(String methodName,
-                                          HttpRequestBase httpRequestBase,
-                                          CloseableHttpAsyncClient client) {
+                                               HttpRequestBase httpRequestBase,
+                                               FutureCallback<HttpResponse> callback,
+                                               CloseableHttpAsyncClient client) {
         if (client == null) {
             log.error("CloseableHttpAsyncClient client is unknown!");
             throw new UnknownClientException();

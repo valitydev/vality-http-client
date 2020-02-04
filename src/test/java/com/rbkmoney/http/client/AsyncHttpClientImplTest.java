@@ -68,7 +68,6 @@ public class AsyncHttpClientImplTest {
                                 .setSocketTimeout(1)
                                 .build())
                         .build())
-                .callback(futureCallback)
                 .build();
 
         stubFor(WireMock.post(urlEqualTo("/post/test"))
@@ -101,7 +100,7 @@ public class AsyncHttpClientImplTest {
     public void post() throws ExecutionException, InterruptedException, IOException {
         latchOk = new CountDownLatch(1);
         HttpPost httpPost = new HttpPost("http://127.0.0.1:8089/post/test");
-        Future<HttpResponse> post = asyncHttpClient.post("test", httpPost);
+        Future<HttpResponse> post = asyncHttpClient.post("test", httpPost, futureCallback);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("post", IOUtils.toString(post.get().getEntity().getContent()));
@@ -111,7 +110,7 @@ public class AsyncHttpClientImplTest {
     public void postException() throws InterruptedException {
         latchFail = new CountDownLatch(1);
         HttpPost httpPost = new HttpPost("http://127.0.0.1:8089/post/fail");
-        Future<HttpResponse> post = asyncHttpClient.post("test", httpPost);
+        Future<HttpResponse> post = asyncHttpClient.post("test", httpPost, futureCallback);
         latchFail.await();
         assertEquals(0, latchFail.getCount());
     }
@@ -120,7 +119,7 @@ public class AsyncHttpClientImplTest {
     public void get() throws ExecutionException, InterruptedException, IOException {
         latchOk = new CountDownLatch(1);
         HttpGet httpGet = new HttpGet("http://127.0.0.1:8089/get/test");
-        Future<HttpResponse> get = asyncHttpClient.get("get-test", httpGet);
+        Future<HttpResponse> get = asyncHttpClient.get("get-test", httpGet, futureCallback);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("get", IOUtils.toString(get.get().getEntity().getContent()));
@@ -130,7 +129,7 @@ public class AsyncHttpClientImplTest {
     public void delete() throws ExecutionException, InterruptedException, IOException {
         latchOk = new CountDownLatch(1);
         HttpDelete httpDelete = new HttpDelete("http://127.0.0.1:8089/delete/test");
-        Future<HttpResponse> deleteResponse = asyncHttpClient.delete("delete-test", httpDelete);
+        Future<HttpResponse> deleteResponse = asyncHttpClient.delete("delete-test", httpDelete, futureCallback);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("delete", IOUtils.toString(deleteResponse.get().getEntity().getContent()));
@@ -141,7 +140,7 @@ public class AsyncHttpClientImplTest {
         latchOk = new CountDownLatch(1);
         HttpPut httpPut = new HttpPut();
         httpPut.setURI(new URI("http://127.0.0.1:8089/put/test"));
-        Future<HttpResponse> putResponse = asyncHttpClient.put("put-test", httpPut);
+        Future<HttpResponse> putResponse = asyncHttpClient.put("put-test", httpPut, futureCallback);
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("put", IOUtils.toString(putResponse.get().getEntity().getContent()));
