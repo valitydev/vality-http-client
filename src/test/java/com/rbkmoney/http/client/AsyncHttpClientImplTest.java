@@ -40,7 +40,6 @@ public class AsyncHttpClientImplTest {
 
     private CountDownLatch latchOk;
     private CountDownLatch latchFail;
-    private CountDownLatch latchCancel;
 
     @Before
     public void init() {
@@ -48,20 +47,16 @@ public class AsyncHttpClientImplTest {
         futureCallback = new FutureCallback<HttpResponse>() {
             @Override
             public void completed(HttpResponse httpResponse) {
-                System.out.println("completed");
                 latchOk.countDown();
             }
 
             @Override
             public void failed(Exception e) {
-                System.out.println("failed");
                 latchFail.countDown();
             }
 
             @Override
             public void cancelled() {
-                System.out.println("cancelled");
-                latchCancel.countDown();
             }
         };
 
@@ -87,12 +82,6 @@ public class AsyncHttpClientImplTest {
 
         stubFor(WireMock.get(urlEqualTo("/get/test"))
                 .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody("get")));
-
-        stubFor(WireMock.get(urlEqualTo("/get/timeout"))
-                .willReturn(aResponse()
-                        .withFixedDelay(2000)
                         .withStatus(200)
                         .withBody("get")));
 
@@ -139,15 +128,6 @@ public class AsyncHttpClientImplTest {
         latchOk.await();
         assertEquals(0, latchOk.getCount());
         assertEquals("get", IOUtils.toString(get.get().getEntity().getContent()));
-    }
-
-    @Test
-    public void getTimneout() throws ExecutionException, InterruptedException, IOException {
-        latchCancel = new CountDownLatch(1);
-        HttpGet httpGet = new HttpGet("http://127.0.0.1:8089/get/timeout");
-        Future<HttpResponse> get = asyncHttpClient.get("get-test", httpGet);
-        latchCancel.await();
-        assertEquals(0, latchCancel.getCount());
     }
 
     @Test
