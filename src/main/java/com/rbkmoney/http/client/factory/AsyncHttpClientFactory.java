@@ -31,6 +31,8 @@ public class AsyncHttpClientFactory {
     private final int maxPerRoute;
     private final int maxTotal;
 
+    private final int keepAliveMs;
+
     //by default availableProcessors
     private final int ioReactorNumber;
 
@@ -64,6 +66,7 @@ public class AsyncHttpClientFactory {
                 .setMaxConnTotal(maxTotal)
                 .setMaxConnPerRoute(maxPerRoute)
                 .setDefaultIOReactorConfig(initReactor())
+                .setKeepAliveStrategy((response, context) -> keepAliveMs)
                 .setDefaultRequestConfig(createDefaultRequestConfig());
     }
 
