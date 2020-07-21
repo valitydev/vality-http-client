@@ -5,6 +5,7 @@ import com.rbkmoney.http.client.properties.KeyStoreProperties;
 import com.rbkmoney.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -44,6 +45,31 @@ public class AsyncHttpClientFactory {
             SSLContext sslContext = createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
             httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                     .setSSLContext(sslContext);
+            return httpClientBuilder.build();
+        } catch (Exception e) {
+            log.error("Error when HttpClientFactory create e: ", e);
+            throw new ClientCreationException(e);
+        }
+    }
+
+    public CloseableHttpAsyncClient create(SslRequestConfig config, ConnectionReuseStrategy connectionReuseStrategy) {
+        try {
+            HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
+            httpClientBuilder.setConnectionReuseStrategy(connectionReuseStrategy);
+            SSLContext sslContext = createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
+            httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .setSSLContext(sslContext);
+            return httpClientBuilder.build();
+        } catch (Exception e) {
+            log.error("Error when HttpClientFactory create e: ", e);
+            throw new ClientCreationException(e);
+        }
+    }
+
+    public CloseableHttpAsyncClient create(ConnectionReuseStrategy connectionReuseStrategy) {
+        try {
+            HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
+            httpClientBuilder.setConnectionReuseStrategy(connectionReuseStrategy);
             return httpClientBuilder.build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
