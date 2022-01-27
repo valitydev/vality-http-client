@@ -36,7 +36,7 @@ public class HttpClientFactoryTest {
         CloseableHttpClient closeableHttpClient = httpClientFactory.create(SslRequestConfig.builder()
                 .certType("pkcs12")
                 .certPass("12345")
-                .certFileName("rbkmoney.p12")
+                .certFileName("vality.p12")
                 .build());
 
         assertNotNull(closeableHttpClient);
