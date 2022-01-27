@@ -11,8 +11,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <groupId>dev.vality.rbk.http.client</groupId>
-    <artifactId>rbk-http-client</artifactId>
+    <groupId>dev.vality</groupId>
+    <artifactId>vality-http-client</artifactId>
     <version>0.0.1</version>
 
     <properties>
