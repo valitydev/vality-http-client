@@ -39,20 +39,20 @@ public class ProxyServerHttpClientPoolTest {
         ProxyRequestConfig proxyRequestConfig = ProxyRequestConfig.builder()
                 .key(PROXY_KEY)
                 .build();
-        CloseableHttpClient closeableHttpClient = httpClientPool.get(proxyRequestConfig);
+        CloseableHttpClient closeableHttpClientRes = httpClientPool.get(proxyRequestConfig);
 
         verify(proxyHttpClientFactory, timeout(1)).create(any());
-        assertEquals(closeableHttpClient, closeableHttpClient);
+        assertEquals(closeableHttpClient, closeableHttpClientRes);
 
         httpClientPool.get(proxyRequestConfig);
         httpClientPool.get(proxyRequestConfig);
 
         verify(proxyHttpClientFactory, timeout(1)).create(proxyRequestConfig);
-        assertEquals(closeableHttpClient, closeableHttpClient);
+        assertEquals(closeableHttpClient, closeableHttpClientRes);
 
         httpClientPool.destroy();
 
-        verify(closeableHttpClient, times(1)).close();
+        verify(closeableHttpClientRes, times(1)).close();
     }
 
 }
