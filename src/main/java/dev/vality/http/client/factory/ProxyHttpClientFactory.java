@@ -25,7 +25,7 @@ public class ProxyHttpClientFactory {
         try {
             HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
             httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-            if (config != null && config.getKey() != null && config.getAddress() != null) {
+            if (needProxy(config)) {
                 HttpHost proxy = new HttpHost(config.getAddress(), config.getPort(), "http");
                 httpClientBuilder.setProxy(proxy);
             }
@@ -34,6 +34,10 @@ public class ProxyHttpClientFactory {
             log.error("Error when HttpClientFactory create e: ", e);
             throw new ClientCreationException(e);
         }
+    }
+
+    private boolean needProxy(ProxyRequestConfig config) {
+        return config != null && config.getKey() != null && config.getAddress() != null;
     }
 
     public CloseableHttpClient create() {
