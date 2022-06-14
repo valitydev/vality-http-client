@@ -36,10 +36,6 @@ public class ProxyHttpClientFactory {
         }
     }
 
-    private boolean needProxy(ProxyRequestConfig config) {
-        return config != null && config.getKey() != null && config.getAddress() != null;
-    }
-
     public CloseableHttpClient create() {
         try {
             HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
@@ -48,6 +44,10 @@ public class ProxyHttpClientFactory {
             log.error("Error when HttpClientFactory create e: ", e);
             throw new ClientCreationException(e);
         }
+    }
+
+    private boolean needProxy(ProxyRequestConfig config) {
+        return config != null && config.getKey() != null && config.getAddress() != null;
     }
 
     private HttpClientBuilder initHttpClientBuilder() {
