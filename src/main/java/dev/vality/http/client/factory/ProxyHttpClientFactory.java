@@ -5,8 +5,12 @@ import dev.vality.http.client.properties.ProxyRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -28,6 +32,13 @@ public class ProxyHttpClientFactory {
             if (needProxy(config)) {
                 HttpHost proxy = new HttpHost(config.getAddress(), config.getPort(), "http");
                 httpClientBuilder.setProxy(proxy);
+
+                if (needAuth(config)) {
+                    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    credentialsProvider.setCredentials(new AuthScope(config.getAddress(), config.getPort()),
+                            new UsernamePasswordCredentials(config.getUser(), config.getPassword()));
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                }
             }
             return httpClientBuilder.build();
         } catch (Exception e) {
@@ -48,6 +59,10 @@ public class ProxyHttpClientFactory {
 
     private boolean needProxy(ProxyRequestConfig config) {
         return config != null && config.getKey() != null && config.getAddress() != null;
+    }
+
+    private boolean needAuth(ProxyRequestConfig config) {
+        return config != null && config.getUser() != null && config.getPassword() != null;
     }
 
     private HttpClientBuilder initHttpClientBuilder() {
