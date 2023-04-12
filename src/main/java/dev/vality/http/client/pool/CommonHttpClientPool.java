@@ -1,7 +1,7 @@
 package dev.vality.http.client.pool;
 
-import dev.vality.http.client.factory.ProxyHttpClientFactory;
-import dev.vality.http.client.properties.ProxyRequestConfig;
+import dev.vality.http.client.factory.HttpClientFactory;
+import dev.vality.http.client.properties.ClientPoolRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,18 +13,19 @@ import java.util.function.Function;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ProxyServerHttpClientPool implements HttpClientPool<ProxyRequestConfig, CloseableHttpClient> {
+public class CommonHttpClientPool implements HttpClientPool<ClientPoolRequestConfig, CloseableHttpClient> {
 
-    private final ProxyHttpClientFactory httpClientFactory;
-    private final Function<ProxyRequestConfig, String> keyGeneratorFunction;
+    private final HttpClientFactory httpClientFactory;
+    private final Function<ClientPoolRequestConfig, String> keyGeneratorFunction;
 
     private Map<String, CloseableHttpClient> pool = new ConcurrentHashMap<>();
 
-    @Override
-    public CloseableHttpClient get(ProxyRequestConfig config) {
-        return pool.computeIfAbsent(keyGeneratorFunction.apply(config), s -> httpClientFactory.create(config));
+    public CloseableHttpClient get(ClientPoolRequestConfig requestConfig) {
+        return pool.computeIfAbsent(keyGeneratorFunction.apply(requestConfig),
+                s -> httpClientFactory.create(requestConfig));
     }
 
+    @Override
     public void destroy() {
         pool.values().forEach(closeableHttpClient -> {
             try {

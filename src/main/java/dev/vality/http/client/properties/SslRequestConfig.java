@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class SslRequestConfig {
 
-    private String certFileName;
+    private String certPath;
     private String certType;
     private String certPass;
 
