@@ -1,8 +1,10 @@
 package dev.vality.http.client.factory.configurer;
 
 import dev.vality.http.client.exception.ClientCreationException;
-import dev.vality.http.client.properties.ClientPoolRequestConfig;
+import dev.vality.http.client.properties.RequestConfig;
 import dev.vality.http.client.properties.ProxyRequestConfig;
+import dev.vality.http.client.validator.ProxyRequestConfigValidator;
+import dev.vality.http.client.validator.RequestConfigValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -14,21 +16,23 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 @Slf4j
 public class ProxyHttpClientConfigurer implements HttpClientConfigurer {
+
+    private final RequestConfigValidator<ProxyRequestConfig> validator = new ProxyRequestConfigValidator();
+
     @Override
-    public void configure(HttpClientBuilder httpClientBuilder, ClientPoolRequestConfig commonConfig) {
+    public void configure(HttpClientBuilder httpClientBuilder, RequestConfig commonConfig) {
         ProxyRequestConfig config = commonConfig.getProxyRequestConfig();
+        validator.validate(config);
         try {
             httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-            if (needProxy(config)) {
-                HttpHost proxy = new HttpHost(config.getAddress(), config.getPort(), "http");
-                httpClientBuilder.setProxy(proxy);
+            HttpHost proxy = new HttpHost(config.getAddress(), config.getPort(), "http");
+            httpClientBuilder.setProxy(proxy);
 
-                if (needAuth(config)) {
-                    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                    credentialsProvider.setCredentials(new AuthScope(config.getAddress(), config.getPort()),
-                            new UsernamePasswordCredentials(config.getUser(), config.getPassword()));
-                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                }
+            if (needAuth(config)) {
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(new AuthScope(config.getAddress(), config.getPort()),
+                        new UsernamePasswordCredentials(config.getUser(), config.getPassword()));
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
@@ -37,12 +41,8 @@ public class ProxyHttpClientConfigurer implements HttpClientConfigurer {
     }
 
     @Override
-    public boolean isApplicable(ClientPoolRequestConfig config) {
+    public boolean isApplicable(RequestConfig config) {
         return config.getProxyRequestConfig() != null;
-    }
-
-    private boolean needProxy(ProxyRequestConfig config) {
-        return config != null && config.getKey() != null && config.getAddress() != null;
     }
 
     private boolean needAuth(ProxyRequestConfig config) {

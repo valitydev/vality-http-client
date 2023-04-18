@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class ClientPoolRequestConfig {
+public class RequestConfig {
     private ProxyRequestConfig proxyRequestConfig;
     private SslRequestConfig sslRequestConfig;
     private Map<String, String> additionalInfo;

@@ -2,10 +2,9 @@ package dev.vality.http.client.factory;
 
 import dev.vality.http.client.exception.ClientCreationException;
 import dev.vality.http.client.factory.configurer.HttpClientConfigurer;
-import dev.vality.http.client.properties.ClientPoolRequestConfig;
+import dev.vality.http.client.properties.RequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -24,7 +23,7 @@ public class HttpClientFactory {
 
     private final List<HttpClientConfigurer> configurers;
 
-    public CloseableHttpClient create(ClientPoolRequestConfig config) {
+    public CloseableHttpClient create(RequestConfig config) {
         try {
             HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
             configurers.stream()
@@ -48,7 +47,7 @@ public class HttpClientFactory {
     }
 
     private HttpClientBuilder initHttpClientBuilder() {
-        RequestConfig config = createDefaultRequestConfig();
+        org.apache.http.client.config.RequestConfig config = createDefaultRequestConfig();
         return HttpClients.custom()
                 .setMaxConnTotal(maxTotal)
                 .setMaxConnPerRoute(maxPerRoute)
@@ -56,8 +55,8 @@ public class HttpClientFactory {
                 .disableAutomaticRetries();
     }
 
-    private RequestConfig createDefaultRequestConfig() {
-        return RequestConfig.custom()
+    private org.apache.http.client.config.RequestConfig createDefaultRequestConfig() {
+        return org.apache.http.client.config.RequestConfig.custom()
                 .setConnectTimeout(connectionTimeout)
                 .setConnectionRequestTimeout(poolTimeout)
                 .setSocketTimeout(requestTimeout)

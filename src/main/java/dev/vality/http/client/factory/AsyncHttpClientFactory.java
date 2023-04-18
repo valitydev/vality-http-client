@@ -2,11 +2,10 @@ package dev.vality.http.client.factory;
 
 import dev.vality.http.client.exception.ClientCreationException;
 import dev.vality.http.client.factory.configurer.async.AsyncHttpClientConfigurer;
-import dev.vality.http.client.properties.ClientPoolRequestConfig;
+import dev.vality.http.client.properties.RequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
@@ -31,7 +30,7 @@ public class AsyncHttpClientFactory {
 
     private final List<AsyncHttpClientConfigurer> configurers;
 
-    public CloseableHttpAsyncClient create(ClientPoolRequestConfig config) {
+    public CloseableHttpAsyncClient create(RequestConfig config) {
         try {
             HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
             configurers.stream()
@@ -44,7 +43,7 @@ public class AsyncHttpClientFactory {
         }
     }
 
-    public CloseableHttpAsyncClient create(ClientPoolRequestConfig config,
+    public CloseableHttpAsyncClient create(RequestConfig config,
                                            ConnectionReuseStrategy connectionReuseStrategy) {
         try {
             HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
@@ -97,8 +96,8 @@ public class AsyncHttpClientFactory {
                 .build();
     }
 
-    private RequestConfig createDefaultRequestConfig() {
-        return RequestConfig.custom()
+    private org.apache.http.client.config.RequestConfig createDefaultRequestConfig() {
+        return org.apache.http.client.config.RequestConfig.custom()
                 .setConnectTimeout(connectionTimeout)
                 .setConnectionRequestTimeout(poolTimeout)
                 .setSocketTimeout(requestTimeout)

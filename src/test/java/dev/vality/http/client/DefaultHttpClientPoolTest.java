@@ -1,9 +1,9 @@
 package dev.vality.http.client;
 
 import dev.vality.http.client.factory.HttpClientFactory;
-import dev.vality.http.client.pool.CommonHttpClientPool;
+import dev.vality.http.client.pool.DefaultHttpClientPool;
 import dev.vality.http.client.pool.HttpClientPool;
-import dev.vality.http.client.properties.ClientPoolRequestConfig;
+import dev.vality.http.client.properties.RequestConfig;
 import dev.vality.http.client.properties.ProxyRequestConfig;
 import dev.vality.http.client.properties.SslRequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -17,11 +17,11 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class CommonHttpClientPoolTest {
+public class DefaultHttpClientPoolTest {
 
     private static final String PROXY_KEY = "proxyKey";
     private static final String CERT_NAME = "certName";
-    HttpClientPool<ClientPoolRequestConfig, CloseableHttpClient> httpClientPool;
+    HttpClientPool<RequestConfig, CloseableHttpClient> httpClientPool;
     @Mock
     private HttpClientFactory httpClientFactory;
     @Mock
@@ -31,14 +31,14 @@ public class CommonHttpClientPoolTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
         httpClientPool =
-                new CommonHttpClientPool(httpClientFactory,
+                new DefaultHttpClientPool(httpClientFactory,
                         requestConfig -> {
                             String result = null;
                             if (requestConfig.getProxyRequestConfig() != null) {
-                                result += requestConfig.getProxyRequestConfig().getKey();
+                                result += requestConfig.getProxyRequestConfig();
                             }
                             if (requestConfig.getSslRequestConfig() != null) {
-                                result += requestConfig.getSslRequestConfig().getCertPath();
+                                result += requestConfig.getSslRequestConfig().getCertFileInfo().getCertPath();
                             }
                             return result;
                         });
@@ -49,20 +49,19 @@ public class CommonHttpClientPoolTest {
         when(httpClientFactory.create(any())).thenReturn(closeableHttpClient);
 
         ProxyRequestConfig proxyRequestConfig = ProxyRequestConfig.builder()
-                .key(PROXY_KEY)
                 .build();
-        ClientPoolRequestConfig clientPoolRequestConfig = ClientPoolRequestConfig.builder()
+        RequestConfig requestConfig = RequestConfig.builder()
                 .proxyRequestConfig(proxyRequestConfig)
                 .build();
-        CloseableHttpClient closeableHttpClientRes = httpClientPool.get(clientPoolRequestConfig);
+        CloseableHttpClient closeableHttpClientRes = httpClientPool.get(requestConfig);
 
         verify(httpClientFactory, timeout(1)).create(any());
         assertEquals(closeableHttpClient, closeableHttpClientRes);
 
-        httpClientPool.get(clientPoolRequestConfig);
-        httpClientPool.get(clientPoolRequestConfig);
+        httpClientPool.get(requestConfig);
+        httpClientPool.get(requestConfig);
 
-        verify(httpClientFactory, timeout(1)).create(clientPoolRequestConfig);
+        verify(httpClientFactory, timeout(1)).create(requestConfig);
         assertEquals(closeableHttpClient, closeableHttpClientRes);
 
         httpClientPool.destroy();
@@ -76,20 +75,22 @@ public class CommonHttpClientPoolTest {
         when(httpClientFactory.create(any())).thenReturn(closeableHttpClient);
 
         SslRequestConfig sslRequestConfig = SslRequestConfig.builder()
-                .certPath(CERT_NAME)
+                .certFileInfo(
+                        SslRequestConfig.CertFileInfo.builder()
+                                .certPath(CERT_NAME).build())
                 .build();
-        ClientPoolRequestConfig clientPoolRequestConfig = ClientPoolRequestConfig.builder()
+        RequestConfig requestConfig = RequestConfig.builder()
                 .sslRequestConfig(sslRequestConfig)
                 .build();
-        CloseableHttpClient closeableHttpClient = httpClientPool.get(clientPoolRequestConfig);
+        CloseableHttpClient closeableHttpClient = httpClientPool.get(requestConfig);
 
         verify(httpClientFactory, timeout(1)).create(any());
         assertEquals(closeableHttpClient, closeableHttpClient);
 
-        httpClientPool.get(clientPoolRequestConfig);
-        httpClientPool.get(clientPoolRequestConfig);
+        httpClientPool.get(requestConfig);
+        httpClientPool.get(requestConfig);
 
-        verify(httpClientFactory, timeout(1)).create(clientPoolRequestConfig);
+        verify(httpClientFactory, timeout(1)).create(requestConfig);
         assertEquals(closeableHttpClient, closeableHttpClient);
 
         httpClientPool.destroy();

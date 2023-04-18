@@ -1,7 +1,7 @@
 package dev.vality.http.client.pool;
 
 import dev.vality.http.client.factory.HttpClientFactory;
-import dev.vality.http.client.properties.ClientPoolRequestConfig;
+import dev.vality.http.client.properties.RequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,14 +13,14 @@ import java.util.function.Function;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CommonHttpClientPool implements HttpClientPool<ClientPoolRequestConfig, CloseableHttpClient> {
+public class DefaultHttpClientPool implements HttpClientPool<RequestConfig, CloseableHttpClient> {
 
     private final HttpClientFactory httpClientFactory;
-    private final Function<ClientPoolRequestConfig, String> keyGeneratorFunction;
+    private final Function<RequestConfig, String> keyGeneratorFunction;
 
     private Map<String, CloseableHttpClient> pool = new ConcurrentHashMap<>();
 
-    public CloseableHttpClient get(ClientPoolRequestConfig requestConfig) {
+    public CloseableHttpClient get(RequestConfig requestConfig) {
         return pool.computeIfAbsent(keyGeneratorFunction.apply(requestConfig),
                 s -> httpClientFactory.create(requestConfig));
     }
