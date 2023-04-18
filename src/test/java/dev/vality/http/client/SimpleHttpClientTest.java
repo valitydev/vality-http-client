@@ -5,19 +5,17 @@ import dev.vality.http.client.exception.RemoteInvocationException;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 
 public class SimpleHttpClientTest {
 

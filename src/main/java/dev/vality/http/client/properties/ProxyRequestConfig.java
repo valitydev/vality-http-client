@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class ProxyRequestConfig {
 
-    private String key;
     private String address;
     private int port;
     private String user;
