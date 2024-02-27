@@ -8,12 +8,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-
-import java.util.concurrent.Future;
-import java.util.function.Function;
 
 @Slf4j
 @Builder

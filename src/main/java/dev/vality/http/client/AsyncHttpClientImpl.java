@@ -6,10 +6,17 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.*;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.AsyncRequestProducer;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
+import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
+import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 
 import java.util.concurrent.Future;
 
@@ -76,14 +83,16 @@ public class AsyncHttpClientImpl implements AsyncHttpClient<CloseableHttpAsyncCl
 
     @Override
     public Future<HttpResponse> put(String methodName,
-                                    HttpPut httpPut,
+                                    AsyncRequestProducer asyncRequestProducer,
                                     FutureCallback<HttpResponse> callback) {
-        return httpExecution(methodName, httpPut, callback, client);
+        return httpExecution(methodName, asyncRequestProducer, callback, client);
     }
 
-    private Future<HttpResponse> httpExecution(String methodName,
-                                               HttpRequestBase httpRequestBase,
-                                               FutureCallback<HttpResponse> callback,
+    private Future<SimpleHttpResponse> httpExecution(String methodName,
+                                                     HttpRequest request,
+                                                     AsyncRequestProducer asyncRequestProducer,
+                                                     AsyncResponseConsumer<SimpleHttpResponse> asyncResponseConsumer,
+                                               FutureCallback<SimpleHttpResponse> callback,
                                                CloseableHttpAsyncClient client) {
         if (client == null) {
             log.error("CloseableHttpAsyncClient client is unknown!");
@@ -91,12 +100,11 @@ public class AsyncHttpClientImpl implements AsyncHttpClient<CloseableHttpAsyncCl
         }
         try {
             Timer.Sample sample = startSampleTimer();
-
-            if (!client.isRunning()) {
-                client.start();
-            }
-
-            Future<HttpResponse> execute = client.execute(httpRequestBase, callback);
+            client.start();
+            AsyncEntityProducer asyncEntityProducer = new BasicAsyncEntityProducer();
+            AsyncRequestProducer asyncRequestProducer1 = new BasicRequestProducer(request, asyncEntityProducer);
+            Future<SimpleHttpResponse> execute = client.execute(asyncRequestProducer1,
+                    asyncResponseConsumer, callback);
 
             String methodType = httpRequestBase.getMethod();
             finishSampleTimer(methodType, methodName, sample);

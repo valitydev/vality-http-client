@@ -7,8 +7,9 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 
 import java.util.function.Function;
 
@@ -75,7 +76,7 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
     }
 
     private <T> Response<T> httpExecution(String methodName,
-                                          HttpRequestBase httpRequestBase,
+                                          HttpUriRequestBase httpRequestBase,
                                           Function<CloseableHttpResponse, T> handler,
                                           CloseableHttpClient client) {
         if (client == null) {
@@ -85,6 +86,7 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
         try {
             Timer.Sample sample = startSampleTimer();
 
+            //TODO: Get rid of deprecated call
             try (CloseableHttpResponse response = client.execute(httpRequestBase)) {
                 String methodType = httpRequestBase.getMethod();
 
@@ -105,9 +107,9 @@ public class SimpleHttpClient implements HttpClient<CloseableHttpClient, Closeab
                                    String methodName,
                                    Timer.Sample sample,
                                    CloseableHttpResponse response) {
-        if (isEnableMetric && response != null && response.getStatusLine() != null && sample != null) {
+        if (isEnableMetric && response != null && sample != null) {
             sample.stop(registry.timer(methodType, methodName,
-                    String.valueOf(response.getStatusLine().getStatusCode())));
+                    String.valueOf(response.getCode())));
         }
     }
 

@@ -4,8 +4,7 @@ import dev.vality.http.client.factory.AsyncHttpClientFactory;
 import dev.vality.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 
 import java.io.IOException;
 import java.util.Map;
