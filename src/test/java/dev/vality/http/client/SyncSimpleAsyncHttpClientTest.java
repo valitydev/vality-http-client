@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class SyncAsyncHttpClientTest {
+public class SyncSimpleAsyncHttpClientTest {
 
     @Mock
     CloseableHttpAsyncClient closeableHttpAsyncClient;
@@ -49,11 +49,11 @@ public class SyncAsyncHttpClientTest {
         when(closeableHttpAsyncClient.execute(any(), any())).thenReturn(httpResponse);
 
         Response<Object> post =
-                syncAsyncHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpAsyncClient);
+                syncAsyncHttpClient.execute("test", httpPost, closeableHttpResponse -> null, closeableHttpAsyncClient);
 
         assertNull(post.getEntity());
 
-        post = syncAsyncHttpClient.post("test", httpPost, closeableHttpResponse -> null);
+        post = syncAsyncHttpClient.execute("test", httpPost, closeableHttpResponse -> null);
 
         assertNull(post.getEntity());
     }
@@ -66,7 +66,7 @@ public class SyncAsyncHttpClientTest {
         when(closeableHttpAsyncClient.execute(any(), any())).thenThrow(new RuntimeException("test!"));
 
         Response<Object> post =
-                syncAsyncHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpAsyncClient);
+                syncAsyncHttpClient.execute("test", httpPost, closeableHttpResponse -> null, closeableHttpAsyncClient);
 
         assertNull(post.getEntity());
     }

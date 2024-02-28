@@ -8,6 +8,13 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.core5.http.HttpResponse;
+
+import java.util.concurrent.Future;
+import java.util.function.Function;
 
 @Slf4j
 @Builder
@@ -18,59 +25,20 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
     private CloseableHttpAsyncClient client;
 
     @Override
-    public <T> Response<T> post(String methodName,
-                                HttpPost httpPost,
-                                Function<HttpResponse, T> handler,
-                                CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpPost, handler, client);
+    public <T> Response<T> execute(String methodName,
+                                   SimpleHttpRequest request,
+                                   Function<HttpResponse, T> handler,
+                                   CloseableHttpAsyncClient client) {
+        return httpExecution(methodName, request, handler, client);
     }
 
     @Override
-    public <T> Response<T> post(String methodName, HttpPost httpPost, Function<HttpResponse, T> handler) {
-        return httpExecution(methodName, httpPost, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> get(String methodName,
-                               HttpGet httpGet,
-                               Function<HttpResponse, T> handler,
-                               CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpGet, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> get(String methodName, HttpGet httpGet, Function<HttpResponse, T> handler) {
-        return httpExecution(methodName, httpGet, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> delete(String methodName,
-                                  HttpDelete httpDelete,
-                                  Function<HttpResponse, T> handler,
-                                  CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpDelete, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> delete(String methodName, HttpDelete httpDelete, Function<HttpResponse, T> handler) {
-        return httpExecution(methodName, httpDelete, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> put(String methodName,
-                               HttpPut httpPut,
-                               Function<HttpResponse, T> handler,
-                               CloseableHttpAsyncClient client) {
-        return httpExecution(methodName, httpPut, handler, client);
-    }
-
-    @Override
-    public <T> Response<T> put(String methodName, HttpPut httpPut, Function<HttpResponse, T> handler) {
-        return httpExecution(methodName, httpPut, handler, client);
+    public <T> Response<T> execute(String methodName, SimpleHttpRequest request, Function<HttpResponse, T> handler) {
+        return httpExecution(methodName, request, handler, client);
     }
 
     private <T> Response<T> httpExecution(String methodName,
-                                          HttpRequestBase httpRequestBase,
+                                          SimpleHttpRequest httpRequestBase,
                                           Function<HttpResponse, T> handler,
                                           CloseableHttpAsyncClient client) {
         if (client == null) {
@@ -80,11 +48,9 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
         try {
             Timer.Sample sample = startSampleTimer();
 
-            if (!client.isRunning()) {
-                client.start();
-            }
+            client.start();
 
-            Future<HttpResponse> execute = client.execute(httpRequestBase, new LogFutureCallback(httpRequestBase));
+            Future<SimpleHttpResponse> execute = client.execute(httpRequestBase, new LogFutureCallback(httpRequestBase));
 
             String methodType = httpRequestBase.getMethod();
             HttpResponse httpResponse = execute.get();
@@ -103,9 +69,9 @@ public class SyncAsyncHttpClient implements HttpClient<CloseableHttpAsyncClient,
     }
 
     private void finishSampleTimer(String methodType, String methodName, Timer.Sample sample, HttpResponse response) {
-        if (isEnableMetric && response != null && response.getStatusLine() != null && sample != null) {
+        if (isEnableMetric && response != null && sample != null) {
             sample.stop(registry.timer(methodType, methodName,
-                    String.valueOf(response.getStatusLine().getStatusCode())));
+                    String.valueOf(response.getCode())));
         }
     }
 
