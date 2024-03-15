@@ -1,18 +1,13 @@
 package dev.vality.http.client;
 
 import dev.vality.http.client.factory.HttpClientFactory;
-import dev.vality.http.client.pool.HttpClientPool;
 import dev.vality.http.client.pool.SslCertHttpClientPool;
 import dev.vality.http.client.properties.SslRequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class SslCertSimpleHttpClientPoolTest {

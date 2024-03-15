@@ -3,47 +3,45 @@ package dev.vality.http.client;
 import dev.vality.http.client.domain.Response;
 import dev.vality.http.client.exception.RemoteInvocationException;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
-public class SimpleHttpClientTest {
+public class HttpClientImplTest {
 
     @Mock
     CloseableHttpClient closeableHttpClient;
     @Mock
     CloseableHttpResponse closeableHttpResponse;
 
-    private SimpleHttpClient simpleHttpClient = SimpleHttpClient.builder()
+    private HttpClientImpl httpClientImpl = HttpClientImpl.builder()
             .registry(new SimpleMeterRegistry())
             .build();
 
-    @Before
+    @BeforeEach
     public void init() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void post() throws URISyntaxException, IOException {
-        HttpPost httpPost = new HttpPost();
-        httpPost.setURI(new URI("/test"));
+        HttpPost httpPost = new HttpPost(new URI("/test"));
 
         when(closeableHttpClient.execute(httpPost)).thenReturn(closeableHttpResponse);
 
         Response<Object> post =
-                simpleHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
+                httpClientImpl.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
 
         assertNull(post.getEntity());
     }
@@ -56,7 +54,7 @@ public class SimpleHttpClientTest {
         when(closeableHttpClient.execute(httpPost)).thenThrow(new RuntimeException("test!"));
 
         Response<Object> post =
-                simpleHttpClient.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
+                httpClientImpl.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
 
         assertNull(post.getEntity());
     }
@@ -69,7 +67,7 @@ public class SimpleHttpClientTest {
         when(closeableHttpClient.execute(httpGet)).thenReturn(closeableHttpResponse);
 
         Response<Object> post =
-                simpleHttpClient.get("get-test", httpGet, closeableHttpResponse -> null, closeableHttpClient);
+                httpClientImpl.get("get-test", httpGet, closeableHttpResponse -> null, closeableHttpClient);
 
         assertNull(post.getEntity());
     }
@@ -82,7 +80,7 @@ public class SimpleHttpClientTest {
         when(closeableHttpClient.execute(httpDelete)).thenReturn(closeableHttpResponse);
 
         Response<Object> deleteResponse =
-                simpleHttpClient.delete("delete-test", httpDelete, closeableHttpResponse -> null, closeableHttpClient);
+                httpClientImpl.delete("delete-test", httpDelete, closeableHttpResponse -> null, closeableHttpClient);
 
         assertNull(deleteResponse.getEntity());
     }
@@ -95,7 +93,7 @@ public class SimpleHttpClientTest {
         when(closeableHttpClient.execute(httpPut)).thenReturn(closeableHttpResponse);
 
         Response<Object> deleteResponse =
-                simpleHttpClient.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpClient);
+                httpClientImpl.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpClient);
 
         assertNull(deleteResponse.getEntity());
     }
