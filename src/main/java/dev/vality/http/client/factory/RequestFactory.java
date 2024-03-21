@@ -1,6 +1,7 @@
 package dev.vality.http.client.factory;
 
-import org.apache.http.client.methods.HttpPost;
+
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 
 public interface RequestFactory<T> {
 
