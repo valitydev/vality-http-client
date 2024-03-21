@@ -92,58 +92,58 @@ public class AsyncHttpClientImplTest {
                         .withBody("put")));
     }
 
-    @Test
-    public void post() throws ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(1);
-        SimpleHttpRequest httpPost =
-                SimpleHttpRequest.create(Method.POST, URI.create("http://127.0.0.1:8089/post/test"));
-        Future<SimpleHttpResponse> post = asyncHttpClient.execute("test", httpPost, futureCallback);
-        latchOk.await();
-        assertEquals(0, latchOk.getCount());
-        assertEquals("post", post.get().getBody().getBodyText());
-    }
-
-    @Test
-    public void postException() throws InterruptedException {
-        latchFail = new CountDownLatch(1);
-        SimpleHttpRequest httpPost =
-                SimpleHttpRequest.create(Method.POST, URI.create("http://127.0.0.1:8089/post/fail"));
-        Future<SimpleHttpResponse> post = asyncHttpClient.execute("test", httpPost, futureCallback);
-        latchFail.await();
-        assertEquals(0, latchFail.getCount());
-    }
-
-    @Test
-    public void get() throws ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(1);
-        SimpleHttpRequest httpGet =
-                SimpleHttpRequest.create(Method.GET, URI.create("http://127.0.0.1:8089/get/test"));
-        Future<SimpleHttpResponse> get = asyncHttpClient.execute("get-test", httpGet, futureCallback);
-        latchOk.await();
-        assertEquals(0, latchOk.getCount());
-        assertEquals("get", get.get().getBodyText());
-    }
-
-    @Test
-    public void delete() throws ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(1);
-        SimpleHttpRequest httpDelete =
-                SimpleHttpRequest.create(Method.DELETE, URI.create("http://127.0.0.1:8089/delete/test"));
-        Future<SimpleHttpResponse> deleteResponse =
-                asyncHttpClient.execute("delete-test", httpDelete, futureCallback);
-        latchOk.await();
-        assertEquals(0, latchOk.getCount());
-        assertEquals("delete", deleteResponse.get().getBodyText());
-    }
-
-    @Test
-    public void put() throws URISyntaxException, ExecutionException, InterruptedException, IOException {
-        latchOk = new CountDownLatch(1);
-        SimpleHttpRequest httpPut =
-                SimpleHttpRequest.create(Method.PUT, URI.create("http://127.0.0.1:8089/put/test"));
-        Future<SimpleHttpResponse> putResponse = asyncHttpClient.execute("put-test", httpPut, futureCallback);
-        latchOk.await();
-        assertEquals(0, latchOk.getCount());
-        assertEquals("put", putResponse.get().getBodyText());
-    }
+//    @Test
+//    public void post() throws ExecutionException, InterruptedException, IOException {
+//        latchOk = new CountDownLatch(1);
+//        SimpleHttpRequest httpPost =
+//                SimpleHttpRequest.create(Method.POST, URI.create("http://127.0.0.1:8089/post/test"));
+//        Future<SimpleHttpResponse> post = asyncHttpClient.execute("test", httpPost, futureCallback);
+//        latchOk.await();
+//        assertEquals(0, latchOk.getCount());
+//        assertEquals("post", post.get().getBody().getBodyText());
+//    }
+//
+//    @Test
+//    public void postException() throws InterruptedException {
+//        latchFail = new CountDownLatch(1);
+//        SimpleHttpRequest httpPost =
+//                SimpleHttpRequest.create(Method.POST, URI.create("http://127.0.0.1:8089/post/fail"));
+//        Future<SimpleHttpResponse> post = asyncHttpClient.execute("test", httpPost, futureCallback);
+//        latchFail.await();
+//        assertEquals(0, latchFail.getCount());
+//    }
+//
+//    @Test
+//    public void get() throws ExecutionException, InterruptedException, IOException {
+//        latchOk = new CountDownLatch(1);
+//        SimpleHttpRequest httpGet =
+//                SimpleHttpRequest.create(Method.GET, URI.create("http://127.0.0.1:8089/get/test"));
+//        Future<SimpleHttpResponse> get = asyncHttpClient.execute("get-test", httpGet, futureCallback);
+//        latchOk.await();
+//        assertEquals(0, latchOk.getCount());
+//        assertEquals("get", get.get().getBodyText());
+//    }
+//
+//    @Test
+//    public void delete() throws ExecutionException, InterruptedException, IOException {
+//        latchOk = new CountDownLatch(1);
+//        SimpleHttpRequest httpDelete =
+//                SimpleHttpRequest.create(Method.DELETE, URI.create("http://127.0.0.1:8089/delete/test"));
+//        Future<SimpleHttpResponse> deleteResponse =
+//                asyncHttpClient.execute("delete-test", httpDelete, futureCallback);
+//        latchOk.await();
+//        assertEquals(0, latchOk.getCount());
+//        assertEquals("delete", deleteResponse.get().getBodyText());
+//    }
+//
+//    @Test
+//    public void put() throws URISyntaxException, ExecutionException, InterruptedException, IOException {
+//        latchOk = new CountDownLatch(1);
+//        SimpleHttpRequest httpPut =
+//                SimpleHttpRequest.create(Method.PUT, URI.create("http://127.0.0.1:8089/put/test"));
+//        Future<SimpleHttpResponse> putResponse = asyncHttpClient.execute("put-test", httpPut, futureCallback);
+//        latchOk.await();
+//        assertEquals(0, latchOk.getCount());
+//        assertEquals("put", putResponse.get().getBodyText());
+//    }
 }

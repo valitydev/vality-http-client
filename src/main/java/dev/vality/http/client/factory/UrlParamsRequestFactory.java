@@ -46,7 +46,8 @@ public class UrlParamsRequestFactory implements RequestFactory<Map<String, Strin
         return post;
     }
 
-    private PoolingHttpClientConnectionManagerBuilder initConnectionManagerBuilder(int connectionTimeoutMs, int socketTimeoutMs) {
+    private PoolingHttpClientConnectionManagerBuilder initConnectionManagerBuilder(
+            int connectionTimeoutMs, int socketTimeoutMs) {
         return PoolingHttpClientConnectionManagerBuilder.create()
                 .setDefaultConnectionConfig(createDefaultConnectionConfig(connectionTimeoutMs, socketTimeoutMs));
     }
