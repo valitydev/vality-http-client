@@ -9,6 +9,9 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -47,14 +50,15 @@ public class HttpClientImplTest {
         Response<Object> post =
                 httpClientImpl.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient);
 
-        assertNull(post.getEntity());
+        assertNull(post);
     }
 
     @Test
     public void postException() throws URISyntaxException, IOException {
         HttpPost httpPost = new HttpPost(new URI("/test"));
 
-        when(closeableHttpClient.execute(httpPost)).thenThrow(new RuntimeException("test!"));
+        when(closeableHttpClient.execute(any(ClassicHttpRequest.class), any(HttpClientResponseHandler.class)))
+                .thenThrow(new RuntimeException("test!"));
 
         assertThrows(RemoteInvocationException.class,
                 () -> httpClientImpl.post("test", httpPost, closeableHttpResponse -> null, closeableHttpClient));
@@ -69,7 +73,7 @@ public class HttpClientImplTest {
         Response<Object> post =
                 httpClientImpl.get("get-test", httpGet, closeableHttpResponse -> null, closeableHttpClient);
 
-        assertNull(post.getEntity());
+        assertNull(post);
     }
 
     @Test
@@ -81,7 +85,7 @@ public class HttpClientImplTest {
         Response<Object> deleteResponse =
                 httpClientImpl.delete("delete-test", httpDelete, closeableHttpResponse -> null, closeableHttpClient);
 
-        assertNull(deleteResponse.getEntity());
+        assertNull(deleteResponse);
     }
 
     @Test
@@ -93,7 +97,7 @@ public class HttpClientImplTest {
         Response<Object> deleteResponse =
                 httpClientImpl.put("put-test", httpPut, closeableHttpResponse -> null, closeableHttpClient);
 
-        assertNull(deleteResponse.getEntity());
+        assertNull(deleteResponse);
     }
 
 }
