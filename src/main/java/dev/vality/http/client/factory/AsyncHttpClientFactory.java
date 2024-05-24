@@ -4,15 +4,21 @@ import dev.vality.http.client.exception.ClientCreationException;
 import dev.vality.http.client.properties.KeyStoreProperties;
 import dev.vality.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.core5.http.ConnectionReuseStrategy;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.core5.reactor.IOReactorConfig;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -42,10 +48,9 @@ public class AsyncHttpClientFactory {
     public CloseableHttpAsyncClient create(SslRequestConfig config) {
         try {
             HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
-            SSLContext sslContext =
-                    createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
-            httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .setSSLContext(sslContext);
+            PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = initConnectionManagerBuilder();
+            connectionManagerBuilder.setTlsStrategy(initTlsStrategy(config));
+            httpClientBuilder.setConnectionManager(connectionManagerBuilder.build());
             return httpClientBuilder.build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
@@ -57,10 +62,9 @@ public class AsyncHttpClientFactory {
         try {
             HttpAsyncClientBuilder httpClientBuilder = initHttpClientBuilder();
             httpClientBuilder.setConnectionReuseStrategy(connectionReuseStrategy);
-            SSLContext sslContext =
-                    createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
-            httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .setSSLContext(sslContext);
+            PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = initConnectionManagerBuilder();
+            connectionManagerBuilder.setTlsStrategy(initTlsStrategy(config));
+            httpClientBuilder.setConnectionManager(connectionManagerBuilder.build());
             return httpClientBuilder.build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
@@ -91,26 +95,44 @@ public class AsyncHttpClientFactory {
 
     private HttpAsyncClientBuilder initHttpClientBuilder() {
         return HttpAsyncClients.custom()
-                .setMaxConnTotal(maxTotal)
-                .setMaxConnPerRoute(maxPerRoute)
-                .setDefaultIOReactorConfig(initReactor())
-                .setKeepAliveStrategy((response, context) -> keepAliveMs)
+                .setIOReactorConfig(initReactor())
+                .setKeepAliveStrategy((response, context) -> Timeout.ofMilliseconds(keepAliveMs))
                 .setDefaultRequestConfig(createDefaultRequestConfig());
     }
 
     private IOReactorConfig initReactor() {
         return IOReactorConfig.custom()
                 .setIoThreadCount(ioReactorNumber > 0 ? ioReactorNumber : Runtime.getRuntime().availableProcessors())
-                .setConnectTimeout(connectionTimeout)
-                .setSoTimeout(requestTimeout)
+                .setSoTimeout(Timeout.ofMilliseconds(requestTimeout))
                 .build();
     }
 
     private RequestConfig createDefaultRequestConfig() {
         return RequestConfig.custom()
-                .setConnectTimeout(connectionTimeout)
-                .setConnectionRequestTimeout(poolTimeout)
-                .setSocketTimeout(requestTimeout)
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(poolTimeout))
+                .build();
+    }
+
+    private PoolingAsyncClientConnectionManagerBuilder initConnectionManagerBuilder() {
+        return PoolingAsyncClientConnectionManagerBuilder.create()
+                .setMaxConnPerRoute(maxPerRoute)
+                .setMaxConnTotal(maxTotal)
+                .setDefaultConnectionConfig(createDefaultConnectionConfig());
+    }
+
+    @SneakyThrows
+    private TlsStrategy initTlsStrategy(SslRequestConfig config) {
+        return ClientTlsStrategyBuilder
+                .create()
+                .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .setSslContext(createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass()))
+                .build();
+    }
+
+    private ConnectionConfig createDefaultConnectionConfig() {
+        return ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeout))
+                .setSocketTimeout(Timeout.ofMilliseconds(requestTimeout))
                 .build();
     }
 

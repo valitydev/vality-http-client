@@ -1,14 +1,16 @@
 package dev.vality.http.client.factory;
 
-import dev.vality.http.client.exception.GenerateRequestException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.util.Timeout;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,19 +35,28 @@ public class UrlParamsRequestFactory implements RequestFactory<Map<String, Strin
                                             int executionTimeout) {
         HttpPost post = new HttpPost(url);
         post.setConfig(RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(executionTimeout)
+                .setConnectTimeout(Timeout.ofMilliseconds(timeout))
+                //TODO: how to set or not used at all?
+                //.setSocketTimeout(executionTimeout)
                 .build());
         List<NameValuePair> urlParams = request.entrySet().stream()
                 .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-        try {
-            post.setEntity(new UrlEncodedFormEntity(urlParams, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            log.error("UrlParamsRequestFactory error when encode params e: ", e);
-            throw new GenerateRequestException();
-        }
+        post.setEntity(new UrlEncodedFormEntity(urlParams, StandardCharsets.UTF_8));
         return post;
+    }
+
+    private PoolingHttpClientConnectionManagerBuilder initConnectionManagerBuilder(
+            int connectionTimeoutMs, int socketTimeoutMs) {
+        return PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(createDefaultConnectionConfig(connectionTimeoutMs, socketTimeoutMs));
+    }
+
+    private ConnectionConfig createDefaultConnectionConfig(int connectionTimeoutMs, int socketTimeoutMs) {
+        return ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeoutMs))
+                .setSocketTimeout(Timeout.ofMilliseconds(socketTimeoutMs))
+                .build();
     }
 
 }

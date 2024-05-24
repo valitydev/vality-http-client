@@ -4,15 +4,15 @@ import dev.vality.http.client.factory.ProxyHttpClientFactory;
 import dev.vality.http.client.pool.HttpClientPool;
 import dev.vality.http.client.pool.ProxyServerHttpClientPool;
 import dev.vality.http.client.properties.ProxyRequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class ProxyServerHttpClientPoolTest {
@@ -26,7 +26,7 @@ public class ProxyServerHttpClientPoolTest {
 
     HttpClientPool<ProxyRequestConfig, CloseableHttpClient> httpClientPool;
 
-    @Before
+    @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
         httpClientPool = new ProxyServerHttpClientPool(proxyHttpClientFactory, ProxyRequestConfig::getKey);

@@ -2,26 +2,34 @@ package dev.vality.http.client.factory;
 
 import dev.vality.http.client.properties.KeyStoreProperties;
 import dev.vality.http.client.properties.SslRequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class HttpClientFactoryTest {
 
     HttpClientFactory httpClientFactory;
+    AutoCloseable mocks;
 
-    @Before
+    @BeforeEach
     public void init() {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         KeyStoreProperties keyStoreProperties = new KeyStoreProperties();
         keyStoreProperties.setCertificateFolder("./src/test/resources/");
         keyStoreProperties.setPassword("12345");
         keyStoreProperties.setType("pkcs12");
         httpClientFactory = new HttpClientFactory(1, 1, 1, 1, 1, keyStoreProperties);
+    }
+
+    @AfterEach
+    public void cleanUp() throws Exception {
+        mocks.close();
     }
 
     @Test

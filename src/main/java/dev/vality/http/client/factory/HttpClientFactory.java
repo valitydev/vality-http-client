@@ -4,13 +4,19 @@ import dev.vality.http.client.exception.ClientCreationException;
 import dev.vality.http.client.properties.KeyStoreProperties;
 import dev.vality.http.client.properties.SslRequestConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.socket.LayeredConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -35,11 +41,11 @@ public class HttpClientFactory {
     public CloseableHttpClient create(SslRequestConfig config) {
         try {
             HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
-            SSLContext sslContext =
-                    createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass());
-            httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .setSSLContext(sslContext);
-            return httpClientBuilder.build();
+            PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = initConnectionManagerBuilder();
+            connectionManagerBuilder.setSSLSocketFactory(initSslSocketFactory(config));
+            return httpClientBuilder
+                    .setConnectionManager(connectionManagerBuilder.build())
+                    .build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
             throw new ClientCreationException(e);
@@ -49,7 +55,10 @@ public class HttpClientFactory {
     public CloseableHttpClient create() {
         try {
             HttpClientBuilder httpClientBuilder = initHttpClientBuilder();
-            return httpClientBuilder.build();
+            PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = initConnectionManagerBuilder();
+            return httpClientBuilder
+                    .setConnectionManager(connectionManagerBuilder.build())
+                    .build();
         } catch (Exception e) {
             log.error("Error when HttpClientFactory create e: ", e);
             throw new ClientCreationException(e);
@@ -59,17 +68,35 @@ public class HttpClientFactory {
     private HttpClientBuilder initHttpClientBuilder() {
         RequestConfig config = createDefaultRequestConfig();
         return HttpClients.custom()
-                .setMaxConnTotal(maxTotal)
-                .setMaxConnPerRoute(maxPerRoute)
                 .setDefaultRequestConfig(config)
                 .disableAutomaticRetries();
     }
 
+    private PoolingHttpClientConnectionManagerBuilder initConnectionManagerBuilder() {
+        return PoolingHttpClientConnectionManagerBuilder.create()
+                .setMaxConnPerRoute(maxPerRoute)
+                .setMaxConnTotal(maxTotal)
+                .setDefaultConnectionConfig(createDefaultConnectionConfig());
+    }
+
+    @SneakyThrows
+    private LayeredConnectionSocketFactory initSslSocketFactory(SslRequestConfig config) {
+        return SSLConnectionSocketFactoryBuilder.create()
+                .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .setSslContext(createSslContext(config.getCertFileName(), config.getCertType(), config.getCertPass()))
+                .build();
+    }
+
+    private ConnectionConfig createDefaultConnectionConfig() {
+        return ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeout))
+                .setSocketTimeout(Timeout.ofMilliseconds(requestTimeout))
+                .build();
+    }
+
     private RequestConfig createDefaultRequestConfig() {
         return RequestConfig.custom()
-                .setConnectTimeout(connectionTimeout)
-                .setConnectionRequestTimeout(poolTimeout)
-                .setSocketTimeout(requestTimeout)
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(poolTimeout))
                 .build();
     }
 
